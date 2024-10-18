@@ -12,6 +12,10 @@
 
 ```yaml
 axon:
+  eventhandling:
+    processors:
+      account-group:
+        mode: subscribing
   axonserver:
     servers: localhost:8124
 ```
@@ -24,7 +28,7 @@ axon:
 - com.eazybytes.accounts.query
   - controller
   - handler
-  - projections
+  - projection
 
 ### 4. Create the following classes under the respective packages
 For the actual source code, please refer to the GitHub repo,
@@ -163,5 +167,3 @@ public class AccountsApplication {
 ```
 
 ---
-
-This setup allows you to run Axon Server locally while ensuring that all important data (like events and configurations) persist even if the container is stopped or removed. Each volume maps specific local directories to the container, ensuring that Axon Server has access to the necessary configuration, data, and events on your system.

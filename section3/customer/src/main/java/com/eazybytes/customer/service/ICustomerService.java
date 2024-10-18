@@ -1,25 +1,27 @@
 package com.eazybytes.customer.service;
 
+import com.eazybytes.customer.command.event.CustomerUpdatedEvent;
 import com.eazybytes.customer.dto.CustomerDto;
+import com.eazybytes.customer.entity.Customer;
 
 public interface ICustomerService {
 
     /**
-     * @param customerDto - CustomerDto Object
+     * @param customer - Customer Object
      */
-    void createCustomer(CustomerDto customerDto);
+    void createCustomer(Customer customer);
 
     /**
      * @param mobileNumber - Input Mobile Number
-     * @return Accounts Details based on a given mobileNumber
+     * @return Customer Details based on a given mobileNumber
      */
     CustomerDto fetchCustomer(String mobileNumber);
 
     /**
-     * @param customerDto - CustomerDto Object
-     * @return boolean indicating if the update of Account details is successful or not
+     * @param event - CustomerUpdatedEvent Object
+     * @return boolean indicating if the update of Customer details is successful or not
      */
-    boolean updateCustomer(CustomerDto customerDto);
+    boolean updateCustomer(CustomerUpdatedEvent event);
 
     /**
      * @param customerId - Input Customer ID
