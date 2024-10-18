@@ -64,25 +64,3 @@ Once the container is running, you can verify the Axon Server by visiting [http:
 ---
 
 This setup allows you to run Axon Server locally while ensuring that all important data (like events and configurations) persist even if the container is stopped or removed. Each volume maps specific local directories to the container, ensuring that Axon Server has access to the necessary configuration, data, and events on your system.
-
-# Axon libraries setup using Maven
-
-All Axon Framework-related JAR files are published on Maven Central. To use Axon Framework in a Spring Boot application built with Maven, add the following to your **eazy-bom/pom.xml**
-
-**Mention the axon version under properties:**
-
-```
-<axon.version>4.10.1</axon.version>
-```
-
-**Mention the following dependency under dependencyManagement->dependencies:**
-
-```
-<dependency>
-  <groupId>org.axonframework</groupId>
-	<artifactId>axon-bom</artifactId>
-	<version>${axon.version}</version>
-	<type>pom</type>
-	<scope>import</scope>
-</dependency>
-```
