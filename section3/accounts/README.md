@@ -69,6 +69,8 @@ public static Accounts mapEventToAccount(AccountUpdatedEvent event, Accounts acc
 
 ### 5. Update the IAccountsService with the below abstract methods
 
+Once the interface is updated, update the AccountsServiceImpl class as well with the code present in the repository
+
 ```java
 public interface IAccountsService {
 
@@ -101,8 +103,6 @@ public interface IAccountsService {
 }
 ```
 
-### 5. Update the AccountsServiceImpl class with the code present in the repository
-
 ### 6. Delete the AccountsController class & it's package as we separated our APIs in to Commands and Queries
 
 ### 7. Add the below method inside the GlobalExceptionHandler class
@@ -124,6 +124,22 @@ public interface IAccountsService {
 ### 8. Inside the AccountsApplication class, make the following changes
 
 ```java
+package com.eazybytes.accounts;
+
+import com.eazybytes.accounts.command.interceptor.AccountsCommandInterceptor;
+import com.eazybytes.common.config.AxonConfig;
+import org.axonframework.commandhandling.CommandBus;
+import org.axonframework.config.EventProcessingConfigurer;
+import org.axonframework.eventhandling.PropagatingErrorHandler;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+
+@SpringBootApplication
+@EnableJpaAuditing(auditorAwareRef = "auditAwareImpl")
 @Import({ AxonConfig.class })
 public class AccountsApplication {
 
@@ -145,22 +161,6 @@ public class AccountsApplication {
 
 }
 ```
-
-
-**Explanation of the Docker Command**
-
-- `-d`: Runs the container in detached mode (in the background).
-- `--name axonserver`: Gives the container a name (`axonserver`), making it easier to manage.
-- `-p 8024:8024 -p 8124:8124`: Maps Axon Server's internal ports (`8024` and `8124`) to the corresponding ports on your local machine. 
-  - Port `8024` is used for the HTTP interface (Axon Dashboard).
-  - Port `8124` is used for the gRPC interface that Axon Framework applications use to communicate with the server.
-- `-v "/Users/eazybytes/Desktop/axonserver/data":/axonserver/data`: Mounts the local `data` folder to the container's `/axonserver/data` directory to persist Axon Server's internal data.
-- `-v "/Users/eazybytes/Desktop/axonserver/events":/axonserver/events`: Mounts the local `events` folder to store Axon events.
-- `-v "/Users/eazybytes/Desktop/axonserver/config":/axonserver/config`: Mounts the local `config` folder, where you placed the `axonserver.properties` file, to the container's `/axonserver/config` directory. This ensures that the server uses the custom configuration defined in this file.
-
-### 4. Verify the Setup
-
-Once the container is running, you can verify the Axon Server by visiting [http://localhost:8024](http://localhost:8024) in your browser. This should open the Axon Server dashboard.
 
 ---
 
