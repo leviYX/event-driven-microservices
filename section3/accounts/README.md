@@ -1,50 +1,151 @@
-# Axon Server Setup Locally Using Docker
+# CQRS and Event Sourcing setup in accounts
 
-Axon Server provides an easy-to-use event store and messaging platform that is tailored for event-driven microservice architectures using Axon Framework. Follow these steps to set up Axon Server on your local machine using Docker.
-
-## Steps for Local Setup
-
-### 1. Create the Axon Server Folder Structure
-
-**Create a Folder Named `axonserver`:**  
-
-   On your Desktop (or any preferred location), create a new folder named **axonserver**. This   will be used to store Axon Server configuration, data, and events.
-
-**Subfolders:**
-
-   - Inside the `axonserver` folder, create the following subfolders:
-     - `config`: This folder will store the configuration file for Axon Server.
-     - `data`: This folder will be used by Axon Server to store its internal data.
-     - `events`: This folder will store the events processed by the server.
-
-### 2. Configure Axon Server
-
-In the `config` folder, create a file named **axonserver.properties**. This file will contain configuration settings for the Axon Server. Add the following properties inside the file:
+### 1. Add the following maven dependency inside **accounts/pom.xml**
 
 ```
-server.port=8024
-axoniq.axonserver.name=EazyBank Axon Server
-axoniq.axonserver.hostname=localhost
-axoniq.axonserver.devmode.enabled=true
+<dependency>
+    <groupId>org.axonframework</groupId>
+    <artifactId>axon-spring-boot-starter</artifactId>
+</dependency>
+```
+### 2. Add the following property inside application.yml
+
+```yaml
+axon:
+  axonserver:
+    servers: localhost:8124
+```
+### 3. Create the following subpackages
+  - com.eazybytes.accounts.command
+    -   aggregate
+    - controller
+    - event
+    - interceptor
+- com.eazybytes.accounts.query
+  - controller
+  - handler
+  - projections
+
+### 4. Create the following classes under the respective packages
+For the actual source code, please refer to the GitHub repo,
+  - com.eazybytes.accounts.command
+    - CreateAccountCommand
+    - DeleteAccountCommand
+    - UpdateAccountCommand
+- com.eazybytes.accounts.command.event
+  - AccountCreatedEvent
+  - AccountDeletedEvent
+  - AccountUpdatedEvent
+- com.eazybytes.accounts.command.aggregate
+  - AccountsAggregate
+- com.eazybytes.accounts.command.controller
+  - AccountsCommandController
+- com.eazybytes.accounts.command.interceptor
+  - AccountsCommandInterceptor
+- com.eazybytes.accounts.query
+  - FindAccountQuery
+- com.eazybytes.accounts.query.projection
+  - AccountProjection
+- com.eazybytes.accounts.query.handler
+  - AccountsQueryHandler
+- com.eazybytes.accounts.query.controller
+  - AccountsQueryController
+
+### 4. Create the following method in AccountsRepository
+
+```java
+Optional<Accounts> findByAccountNumberAndActiveSw(Long accountNumber, boolean active);
 ```
 
-- `server.port`: Specifies the port on which the Axon Server will be accessible. In this case, it's set to `8024`.
-- `axoniq.axonserver.name`: Assigns a name to the Axon Server instance. Here it’s set as "EazyBank Axon Server".
-- `axoniq.axonserver.hostname`: Defines the hostname, which is set to `localhost` for local development.
-- `axoniq.axonserver.devmode.enabled`: When enabled (`true`), this mode optimizes the server for local development purposes.
+### 4. Create the following method in AccountsMapper
 
-### 3. Run the Axon Server Docker Container
-
-Now that the configuration is ready, you can start the Axon Server in Docker. Run the following Docker command in your terminal:
-
-```bash
-docker run -d --name axonserver \
-    -p 8024:8024 -p 8124:8124 \
-    -v "/Users/eazybytes/Desktop/axonserver/data":/axonserver/data \
-    -v "/Users/eazybytes/Desktop/axonserver/events":/axonserver/events \
-    -v "/Users/eazybytes/Desktop/axonserver/config":/axonserver/config \
-    axoniq/axonserver
+```java
+public static Accounts mapEventToAccount(AccountUpdatedEvent event, Accounts account) {
+  account.setAccountType(event.getAccountType());
+  account.setBranchAddress(event.getBranchAddress());
+  return account;
+}
 ```
+
+### 5. Update the IAccountsService with the below abstract methods
+
+```java
+public interface IAccountsService {
+
+    /**
+     *
+     * @param account - Accounts Object
+     */
+    void createAccount(Accounts account);
+
+    /**
+     *
+     * @param mobileNumber - Input Mobile Number
+     * @return Accounts Details based on a given mobileNumber
+     */
+    AccountsDto fetchAccount(String mobileNumber);
+
+    /**
+     *
+     * @param event - AccountUpdatedEvent Object
+     * @return boolean indicating if the update of Account details is successful or not
+     */
+    boolean updateAccount(AccountUpdatedEvent event);
+
+    /**
+     *
+     * @param accountNumber - Input Account Number
+     * @return boolean indicating if the delete of Account details is successful or not
+     */
+    boolean deleteAccount(Long accountNumber);
+}
+```
+
+### 5. Update the AccountsServiceImpl class with the code present in the repository
+
+### 6. Delete the AccountsController class & it's package as we separated our APIs in to Commands and Queries
+
+### 7. Add the below method inside the GlobalExceptionHandler class
+
+```java
+@ExceptionHandler(CommandExecutionException.class)
+    public ResponseEntity<ErrorResponseDto> handleGlobalException(CommandExecutionException exception,
+            WebRequest webRequest) {
+        ErrorResponseDto errorResponseDTO = new ErrorResponseDto(
+                webRequest.getDescription(false),
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                exception.getMessage(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(errorResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+```
+
+### 8. Inside the AccountsApplication class, make the following changes
+
+```java
+@Import({ AxonConfig.class })
+public class AccountsApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(AccountsApplication.class, args);
+    }
+
+    @Autowired
+    public void registerAccountCommandInterceptor(ApplicationContext context,
+            CommandBus commandBus) {
+        commandBus.registerDispatchInterceptor(context.getBean(AccountsCommandInterceptor.class));
+    }
+
+    @Autowired
+    public void configure(EventProcessingConfigurer config) {
+        config.registerListenerInvocationErrorHandler("account-group",
+                conf -> PropagatingErrorHandler.instance());
+    }
+
+}
+```
+
 
 **Explanation of the Docker Command**
 
