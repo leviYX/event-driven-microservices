@@ -55,13 +55,13 @@ For the actual source code, please refer to the GitHub repo,
 - com.eazybytes.accounts.query.controller
   - AccountsQueryController
 
-### 4. Create the following method in AccountsRepository
+### 5. Create the following method in AccountsRepository
 
 ```java
-Optional<Accounts> findByAccountNumberAndActiveSw(Long accountNumber, boolean active);
+Optional<Accounts> findByAccountNumberAndActiveSw(long accountNumber, boolean active);
 ```
 
-### 4. Create the following method in AccountsMapper
+### 6. Create the following method in AccountsMapper
 
 ```java
 public static Accounts mapEventToAccount(AccountUpdatedEvent event, Accounts account) {
@@ -71,7 +71,7 @@ public static Accounts mapEventToAccount(AccountUpdatedEvent event, Accounts acc
 }
 ```
 
-### 5. Update the IAccountsService with the below abstract methods
+### 7. Update the IAccountsService with the below abstract methods
 
 Once the interface is updated, update the AccountsServiceImpl class as well with the code present in the repository
 
@@ -107,9 +107,9 @@ public interface IAccountsService {
 }
 ```
 
-### 6. Delete the AccountsController class & it's package as we separated our APIs in to Commands and Queries
+### 8. Delete the AccountsController class & it's package as we separated our APIs in to Commands and Queries
 
-### 7. Add the below method inside the GlobalExceptionHandler class
+### 9. Add the below method inside the GlobalExceptionHandler class
 
 ```java
 @ExceptionHandler(CommandExecutionException.class)
@@ -118,33 +118,30 @@ public interface IAccountsService {
         ErrorResponseDto errorResponseDTO = new ErrorResponseDto(
                 webRequest.getDescription(false),
                 HttpStatus.INTERNAL_SERVER_ERROR,
-                exception.getMessage(),
+                "CommandExecutionException occurred due to: "+exception.getMessage(),
                 LocalDateTime.now()
         );
         return new ResponseEntity<>(errorResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 ```
 
-### 8. Inside the AccountsApplication class, make the following changes
+### 10. Inside the AccountsApplication class, make the following changes
 
 ```java
 package com.eazybytes.accounts;
 
 import com.eazybytes.accounts.command.interceptor.AccountsCommandInterceptor;
-import com.eazybytes.common.config.AxonConfig;
-import org.axonframework.commandhandling.CommandBus;
+import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.config.EventProcessingConfigurer;
 import org.axonframework.eventhandling.PropagatingErrorHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @SpringBootApplication
 @EnableJpaAuditing(auditorAwareRef = "auditAwareImpl")
-@Import({ AxonConfig.class })
 public class AccountsApplication {
 
     public static void main(String[] args) {
@@ -152,9 +149,8 @@ public class AccountsApplication {
     }
 
     @Autowired
-    public void registerAccountCommandInterceptor(ApplicationContext context,
-            CommandBus commandBus) {
-        commandBus.registerDispatchInterceptor(context.getBean(AccountsCommandInterceptor.class));
+    public void registerCustomerCommandInterceptor(ApplicationContext context, CommandGateway commandGateway) {
+        commandGateway.registerDispatchInterceptor(context.getBean(AccountsCommandInterceptor.class));
     }
 
     @Autowired

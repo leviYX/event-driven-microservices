@@ -60,13 +60,13 @@ For the actual source code, please refer to the GitHub repo,
 - com.eazybytes.cards.query.controller
     - CardQueryController
 
-### 4. Create the following method in CardsRepository
+### 5. Create the following method in CardsRepository
 
 ```java
 Optional<Cards> findByCardNumberAndActiveSw(Long cardNumber, boolean activeSw);
 ```
 
-### 4. Create the following method in CardMapper
+### 6. Create the following method in CardMapper
 
 ```java
 public static Cards mapEventToCard(CardUpdatedEvent event, Cards card) {
@@ -78,7 +78,7 @@ public static Cards mapEventToCard(CardUpdatedEvent event, Cards card) {
 }
 ```
 
-### 5. Update the ICardsService with the below abstract methods
+### 7. Update the ICardsService with the below abstract methods
 
 Once the interface is updated, update the CardsServiceImpl class as well with the code present in the repository
 
@@ -115,45 +115,42 @@ public interface ICardsService {
 }
 ```
 
-### 6. Delete the CardsController class & it's package as we separated our APIs in to Commands and Queries
+### 8. Delete the CardsController class & it's package as we separated our APIs in to Commands and Queries
 
-### 7. Add the below method inside the GlobalExceptionHandler class
+### 9. Add the below method inside the GlobalExceptionHandler class
 
 ```java
 
 @ExceptionHandler(CommandExecutionException.class)
 public ResponseEntity<ErrorResponseDto> handleGlobalException(CommandExecutionException exception,
         WebRequest webRequest) {
-    ErrorResponseDto errorResponseDTO = new ErrorResponseDto(
-            webRequest.getDescription(false),
-            HttpStatus.INTERNAL_SERVER_ERROR,
-            exception.getMessage(),
-            LocalDateTime.now()
-    );
-    return new ResponseEntity<>(errorResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+  ErrorResponseDto errorResponseDTO = new ErrorResponseDto(
+          webRequest.getDescription(false),
+          HttpStatus.INTERNAL_SERVER_ERROR,
+          "CommandExecutionException occurred due to: "+exception.getMessage(),
+          LocalDateTime.now()
+  );
+  return new ResponseEntity<>(errorResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
 }
 ```
 
-### 8. Inside the CardsApplication class, make the following changes
+### 10. Inside the CardsApplication class, make the following changes
 
 ```java
 package com.eazybytes.cards;
 
-import com.eazybytes.cards.command.interceptor.CardsCommandInterceptor;
-import com.eazybytes.common.config.AxonConfig;
-import org.axonframework.commandhandling.CommandBus;
+import com.eazybytes.cards.command.interceptor.CardCommandInterceptor;
+import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.config.EventProcessingConfigurer;
 import org.axonframework.eventhandling.PropagatingErrorHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @SpringBootApplication
 @EnableJpaAuditing(auditorAwareRef = "auditAwareImpl")
-@Import({ AxonConfig.class })
 public class CardsApplication {
 
   public static void main(String[] args) {
@@ -161,9 +158,8 @@ public class CardsApplication {
   }
 
   @Autowired
-  public void registerCardsCommandInterceptor(ApplicationContext context,
-          CommandBus commandBus) {
-    commandBus.registerDispatchInterceptor(context.getBean(CardsCommandInterceptor.class));
+  public void registerCustomerCommandInterceptor(ApplicationContext context, CommandGateway commandGateway) {
+    commandGateway.registerDispatchInterceptor(context.getBean(CardCommandInterceptor.class));
   }
 
   @Autowired
@@ -173,7 +169,6 @@ public class CardsApplication {
   }
 
 }
-
 ```
 
 ---

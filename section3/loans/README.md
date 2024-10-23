@@ -60,13 +60,13 @@ For the actual source code, please refer to the GitHub repo,
 - com.eazybytes.loans.query.controller
     - LoanQueryController
 
-### 4. Create the following method in LoansRepository
+### 5. Create the following method in LoansRepository
 
 ```java
 Optional<Loans> findByLoanNumberAndActiveSw(Long loanNumber, boolean activeSw);
 ```
 
-### 4. Create the following method in LoanMapper
+### 6. Create the following method in LoanMapper
 
 ```java
 public static Loans mapEventToLoan(LoanUpdatedEvent event, Loans loan) {
@@ -78,7 +78,7 @@ public static Loans mapEventToLoan(LoanUpdatedEvent event, Loans loan) {
 }
 ```
 
-### 5. Update the ILoansService with the below abstract methods
+### 7. Update the ILoansService with the below abstract methods
 
 Once the interface is updated, update the LoansServiceImpl class as well with the code present in the repository
 
@@ -112,9 +112,9 @@ public interface ILoansService {
 
 ```
 
-### 6. Delete the CardsController class & it's package as we separated our APIs in to Commands and Queries
+### 8. Delete the LoansController class & it's package as we separated our APIs in to Commands and Queries
 
-### 7. Add the below method inside the GlobalExceptionHandler class
+### 9. Add the below method inside the GlobalExceptionHandler class
 
 ```java
 
@@ -131,41 +131,37 @@ public ResponseEntity<ErrorResponseDto> handleGlobalException(CommandExecutionEx
 }
 ```
 
-### 8. Inside the CardsApplication class, make the following changes
+### 10. Inside the LoansApplication class, make the following changes
 
 ```java
-package com.eazybytes.cards;
+package com.eazybytes.loans;
 
-import com.eazybytes.cards.command.interceptor.CardsCommandInterceptor;
-import com.eazybytes.common.config.AxonConfig;
-import org.axonframework.commandhandling.CommandBus;
+import com.eazybytes.loans.command.interceptor.LoanCommandInterceptor;
+import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.config.EventProcessingConfigurer;
 import org.axonframework.eventhandling.PropagatingErrorHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @SpringBootApplication
 @EnableJpaAuditing(auditorAwareRef = "auditAwareImpl")
-@Import({ AxonConfig.class })
-public class CardsApplication {
+public class LoansApplication {
 
   public static void main(String[] args) {
-    SpringApplication.run(CardsApplication.class, args);
+    SpringApplication.run(LoansApplication.class, args);
   }
 
   @Autowired
-  public void registerCardsCommandInterceptor(ApplicationContext context,
-          CommandBus commandBus) {
-    commandBus.registerDispatchInterceptor(context.getBean(CardsCommandInterceptor.class));
+  public void registerCustomerCommandInterceptor(ApplicationContext context, CommandGateway commandGateway) {
+    commandGateway.registerDispatchInterceptor(context.getBean(LoanCommandInterceptor.class));
   }
 
   @Autowired
   public void configure(EventProcessingConfigurer config) {
-    config.registerListenerInvocationErrorHandler("card-group",
+    config.registerListenerInvocationErrorHandler("customer-group",
             conf -> PropagatingErrorHandler.instance());
   }
 
