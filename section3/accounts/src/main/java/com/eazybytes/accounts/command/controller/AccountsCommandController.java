@@ -25,7 +25,6 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class AccountsCommandController {
 
-    private final IAccountsService iAccountsService;
     private final CommandGateway commandGateway;
 
     @PostMapping("/create")

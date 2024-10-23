@@ -1,10 +1,8 @@
 package com.eazybytes.accounts.query;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.Value;
 
-@Builder
-@Data
+@Value
 public class FindAccountQuery {
     private final String mobileNumber;
 }

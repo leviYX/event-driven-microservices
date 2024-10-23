@@ -9,10 +9,10 @@ import org.axonframework.modelling.command.TargetAggregateIdentifier;
 public class CreateAccountCommand {
 
     @TargetAggregateIdentifier
-    private Long accountNumber;
-    private String mobileNumber;
-    private String accountType;
-    private String branchAddress;
-    private boolean activeSw;
+    private final Long accountNumber;
+    private final String mobileNumber;
+    private final String accountType;
+    private final String branchAddress;
+    private final boolean activeSw;
 
 }

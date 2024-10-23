@@ -1,12 +1,13 @@
 package com.eazybytes.customer.query.projection;
 
-import com.eazybytes.customer.command.event.*;
+import com.eazybytes.customer.command.event.CustomerCreatedEvent;
+import com.eazybytes.customer.command.event.CustomerDeletedEvent;
+import com.eazybytes.customer.command.event.CustomerUpdatedEvent;
 import com.eazybytes.customer.entity.Customer;
 import com.eazybytes.customer.service.ICustomerService;
 import lombok.RequiredArgsConstructor;
 import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
-import org.axonframework.eventhandling.gateway.EventGateway;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
@@ -16,23 +17,23 @@ import org.springframework.stereotype.Component;
 public class CustomerProjection {
 
     private final ICustomerService iCustomerService;
-    private final EventGateway eventGateway;
 
     @EventHandler
-    public void on(CustomerCreatedEvent event) {
+    public void on(CustomerCreatedEvent customerCreatedEvent) {
         Customer customerEntity = new Customer();
-        BeanUtils.copyProperties(event, customerEntity);
+        BeanUtils.copyProperties(customerCreatedEvent,customerEntity);
         iCustomerService.createCustomer(customerEntity);
     }
 
     @EventHandler
-    public void on(CustomerUpdatedEvent event) {
-        iCustomerService.updateCustomer(event);
+    public void on(CustomerUpdatedEvent customerUpdatedEvent) {
+        // throw new RuntimeException("It is a bad day!!");
+        iCustomerService.updateCustomer(customerUpdatedEvent);
     }
 
     @EventHandler
-    public void on(CustomerDeletedEvent event) {
-        iCustomerService.deleteCustomer(event.getCustomerId());
+    public void on(CustomerDeletedEvent customerDeletedEvent) {
+        iCustomerService.deleteCustomer(customerDeletedEvent.getCustomerId());
     }
 
 }

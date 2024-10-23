@@ -7,21 +7,21 @@ import com.eazybytes.customer.entity.Customer;
 public interface ICustomerService {
 
     /**
-     * @param customer - Customer Object
+     * @param customerEntity - Customer Object
      */
-    void createCustomer(Customer customer);
+    void createCustomer(Customer customerEntity);
 
     /**
      * @param mobileNumber - Input Mobile Number
-     * @return Customer Details based on a given mobileNumber
+     * @return Accounts Details based on a given mobileNumber
      */
     CustomerDto fetchCustomer(String mobileNumber);
 
     /**
-     * @param event - CustomerUpdatedEvent Object
-     * @return boolean indicating if the update of Customer details is successful or not
+     * @param customerUpdatedEvent - CustomerUpdatedEvent Object
+     * @return boolean indicating if the update of Account details is successful or not
      */
-    boolean updateCustomer(CustomerUpdatedEvent event);
+    boolean updateCustomer(CustomerUpdatedEvent customerUpdatedEvent);
 
     /**
      * @param customerId - Input Customer ID

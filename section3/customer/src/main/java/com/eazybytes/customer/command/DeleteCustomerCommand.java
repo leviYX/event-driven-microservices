@@ -4,11 +4,15 @@ import lombok.Builder;
 import lombok.Data;
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
-@Builder
+/**
+ * VERB+NOUN+Command
+ */
 @Data
+@Builder
 public class DeleteCustomerCommand {
 
     @TargetAggregateIdentifier
     private final String customerId;
-    private boolean activeSw;
+    private final boolean activeSw;
+
 }

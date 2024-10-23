@@ -41,10 +41,10 @@ public class CustomerServiceImpl implements ICustomerService {
     }
 
     @Override
-    public boolean updateCustomer(CustomerUpdatedEvent event) {
-        Customer customer = customerRepository.findByMobileNumberAndActiveSw(event.getMobileNumber(), true)
-                .orElseThrow(() -> new ResourceNotFoundException("Customer", "mobileNumber", event.getMobileNumber()));
-        CustomerMapper.mapEventToCustomer(event, customer);
+    public boolean updateCustomer(CustomerUpdatedEvent customerUpdatedEvent) {
+        Customer customer = customerRepository.findByMobileNumberAndActiveSw(customerUpdatedEvent.getMobileNumber(), true)
+                .orElseThrow(() -> new ResourceNotFoundException("Customer", "mobileNumber", customerUpdatedEvent.getMobileNumber()));
+        CustomerMapper.mapEventToCustomer(customerUpdatedEvent, customer);
         customerRepository.save(customer);
         return true;
     }

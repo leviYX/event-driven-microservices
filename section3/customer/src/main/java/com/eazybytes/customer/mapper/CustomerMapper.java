@@ -15,10 +15,21 @@ public class CustomerMapper {
         return customerDto;
     }
 
-    public static Customer mapEventToCustomer(CustomerUpdatedEvent event, Customer customer) {
-        customer.setName(event.getName());
-        customer.setEmail(event.getEmail());
+    public static Customer mapToCustomer(CustomerDto customerDto, Customer customer) {
+        customer.setCustomerId(customerDto.getCustomerId());
+        customer.setName(customerDto.getName());
+        customer.setEmail(customerDto.getEmail());
+        customer.setMobileNumber(customerDto.getMobileNumber());
+        if(customerDto.isActiveSw()) {
+            customer.setActiveSw(customerDto.isActiveSw());
+        }
         return customer;
+    }
+
+    public static Customer mapEventToCustomer(CustomerUpdatedEvent event, Customer customer) {
+            customer.setName(event.getName());
+            customer.setEmail(event.getEmail());
+            return customer;
     }
 
 }

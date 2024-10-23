@@ -2,6 +2,9 @@ package com.eazybytes.customer.command.event;
 
 import lombok.Data;
 
+/**
+ * NOUN+VERB(PastTense)+Event
+ */
 @Data
 public class CustomerCreatedEvent {
 
@@ -10,5 +13,6 @@ public class CustomerCreatedEvent {
     private String email;
     private String mobileNumber;
     private boolean activeSw;
+
 
 }

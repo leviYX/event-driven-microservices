@@ -9,14 +9,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class CustomersQueryHandler {
+public class CustomerQueryHandler {
 
     private final ICustomerService iCustomerService;
 
     @QueryHandler
-    public CustomerDto findCustomer(FindCustomerQuery query) {
-        CustomerDto customerDto = iCustomerService.fetchCustomer(query.getMobileNumber());
-        return customerDto;
+    public CustomerDto findCustomer(FindCustomerQuery findCustomerQuery) {
+        return iCustomerService.fetchCustomer(findCustomerQuery.getMobileNumber());
     }
 
 }

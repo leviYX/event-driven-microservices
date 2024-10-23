@@ -6,11 +6,11 @@ import com.eazybytes.customer.command.UpdateCustomerCommand;
 import com.eazybytes.customer.constants.CustomerConstants;
 import com.eazybytes.customer.dto.CustomerDto;
 import com.eazybytes.customer.dto.ResponseDto;
-import com.eazybytes.customer.service.ICustomerService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.axonframework.commandhandling.gateway.CommandGateway;
-import org.axonframework.queryhandling.QueryGateway;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -24,17 +24,15 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CustomerCommandController {
 
-    private final ICustomerService iCustomerService;
     private final CommandGateway commandGateway;
-    private final QueryGateway queryGateway;
 
     @PostMapping("/create")
     public ResponseEntity<ResponseDto> createCustomer(@Valid @RequestBody CustomerDto customerDto) {
-        CreateCustomerCommand customerCommand = CreateCustomerCommand.builder()
+        CreateCustomerCommand createCustomerCommand = CreateCustomerCommand.builder()
                 .customerId(UUID.randomUUID().toString()).email(customerDto.getEmail())
                 .name(customerDto.getName()).mobileNumber(customerDto.getMobileNumber())
                 .activeSw(CustomerConstants.ACTIVE_SW).build();
-        commandGateway.sendAndWait(customerCommand);
+        commandGateway.sendAndWait(createCustomerCommand);
         return ResponseEntity
                 .status(org.springframework.http.HttpStatus.CREATED)
                 .body(new ResponseDto(CustomerConstants.STATUS_201, CustomerConstants.MESSAGE_201));
@@ -47,20 +45,19 @@ public class CustomerCommandController {
                 .name(customerDto.getName()).mobileNumber(customerDto.getMobileNumber())
                 .activeSw(CustomerConstants.ACTIVE_SW).build();
         commandGateway.sendAndWait(updateCustomerCommand);
-        return ResponseEntity
-                .status(org.springframework.http.HttpStatus.OK)
+        return ResponseEntity.status(HttpStatus.OK)
                 .body(new ResponseDto(CustomerConstants.STATUS_200, CustomerConstants.MESSAGE_200));
     }
 
     @PatchMapping("/delete")
-    public ResponseEntity<ResponseDto> deleteCustomer(@RequestParam("customerId") String customerId) {
+    public ResponseEntity<ResponseDto> deleteCustomer(@RequestParam("customerId")
+    @Pattern(regexp = "(^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$)",
+            message = "CustomerId is invalid") String customerId) {
         DeleteCustomerCommand deleteCustomerCommand = DeleteCustomerCommand.builder()
                 .customerId(customerId).activeSw(CustomerConstants.IN_ACTIVE_SW).build();
         commandGateway.sendAndWait(deleteCustomerCommand);
-        return ResponseEntity
-                .status(org.springframework.http.HttpStatus.OK)
+        return ResponseEntity.status(HttpStatus.OK)
                 .body(new ResponseDto(CustomerConstants.STATUS_200, CustomerConstants.MESSAGE_200));
     }
-
 
 }

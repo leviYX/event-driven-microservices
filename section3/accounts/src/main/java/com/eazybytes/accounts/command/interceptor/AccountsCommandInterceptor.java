@@ -27,7 +27,7 @@ public class AccountsCommandInterceptor implements MessageDispatchInterceptor<Co
     @Nonnull
     @Override
     public BiFunction<Integer, CommandMessage<?>, CommandMessage<?>> handle(@Nonnull List<? extends
-                CommandMessage<?>> messages) {
+            CommandMessage<?>> messages) {
         return (index, command) -> {
             if (CreateAccountCommand.class.equals(command.getPayloadType())) {
                 CreateAccountCommand createAccountCommand = (CreateAccountCommand) command.getPayload();

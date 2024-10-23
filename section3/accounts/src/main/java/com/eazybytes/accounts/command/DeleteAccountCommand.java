@@ -9,7 +9,7 @@ import org.axonframework.modelling.command.TargetAggregateIdentifier;
 public class DeleteAccountCommand {
 
     @TargetAggregateIdentifier
-    private Long accountNumber;
-    private boolean activeSw;
+    private final Long accountNumber;
+    private final boolean activeSw;
 
 }

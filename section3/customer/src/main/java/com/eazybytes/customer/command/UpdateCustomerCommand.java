@@ -4,15 +4,15 @@ import lombok.Builder;
 import lombok.Data;
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
-@Builder
 @Data
+@Builder
 public class UpdateCustomerCommand {
 
     @TargetAggregateIdentifier
     private final String customerId;
-    private final String mobileNumber;
     private final String name;
     private final String email;
-    private boolean activeSw;
+    private final String mobileNumber;
+    private final boolean activeSw;
 
 }
