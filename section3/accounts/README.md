@@ -20,12 +20,13 @@ axon:
     servers: localhost:8124
 ```
 ### 3. Create the following subpackages
-  - com.eazybytes.accounts.command
+
+✅ com.eazybytes.accounts.command
     -   aggregate
     - controller
     - event
     - interceptor
-- com.eazybytes.accounts.query
+✅ com.eazybytes.accounts.query
   - controller
   - handler
   - projection
