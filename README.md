@@ -1,6 +1,6 @@
 # Event Driven Microservices with CQRS, Saga, Event Sourcing
 
-[![Image](https://github.com/eazybytes/microservices/blob/3.2.0/Microservice.png "Master Microservices with Java, Spring, Docker, Kubernetes")](https://www.udemy.com/course/master-microservices-with-spring-docker-kubernetes/?referralCode=9365DB9B7EE637F629A9)
+[![Image](https://github.com/eazybytes/event-driven-microservices/blob/3.3.4/edm.png "Event Driven Microservices with CQRS, Saga, Event Sourcing")](https://www.udemy.com/course/event-driven-microservices-with-cqrs-saga-event-sourcing/?referralCode=C1C67F2C2F541C8F2B96)
 
 Learn how to develop Event Driven Microservices using Spring Boot, Axon framework, CQRS, Saga, Event Sourcing patterns
 
